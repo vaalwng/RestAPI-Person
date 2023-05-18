@@ -7,6 +7,9 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,7 +20,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController @Slf4j
-@RequestMapping(path = "/api/person", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/person")
 public class PersonController {
 
     private final PersonService personService;
@@ -28,7 +31,7 @@ public class PersonController {
     }
 
     // sample: http://localhost:7777/zesty/api/person/create?firstName=John&lastName=Doe&age=35
-    @RequestMapping(value = "/create", produces = APPLICATION_JSON_VALUE, method = {RequestMethod.PUT, RequestMethod.GET})
+    @PostMapping(value = "/create")
     public ResponseEntity<Person> createPerson(@RequestParam(value = "firstName") final String firstName,
                                @RequestParam(value = "lastName") final String lastName,
                                @RequestParam(value = "age") final int age) {
@@ -37,17 +40,14 @@ public class PersonController {
     }
 
     // sample: http://localhost:7777/zesty/api/person/delete?id=1
-    @RequestMapping(value = "/delete", method = {RequestMethod.DELETE, RequestMethod.GET})
-    public ResponseEntity<HttpStatus> deletePerson(@RequestParam(value = "id") final Long id) {
-        val isDeleted = personService.deletePerson(id);
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @DeleteMapping(value = "/delete")
+    public ResponseEntity<String> deletePerson(@RequestParam(value = "id") final Long id) {
+        val result = personService.deletePerson(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     // sample: http://localhost:7777/zesty/api/person/getall
-    @RequestMapping(value = "/getall", produces = APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
+    @GetMapping(value = "/getall")
     public ResponseEntity<List<Person>> getAllPersons() {
         return new ResponseEntity<>(personService.getAllPersons(), HttpStatus.OK);
     }

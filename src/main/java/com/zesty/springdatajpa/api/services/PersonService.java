@@ -1,6 +1,7 @@
 package com.zesty.springdatajpa.api.services;
 
 import com.zesty.springdatajpa.api.bean.Person;
+import com.zesty.springdatajpa.api.exception.PersonNotFoundException;
 import com.zesty.springdatajpa.db.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -41,15 +42,13 @@ public class PersonService {
         }
     }
 
-    public boolean deletePerson(final Long id) {
-        try {
-            personRepository.deleteById(id);
-            log.info("SUCCESSFUL removal Person with id:{}", id);
-            return true;
-        } catch (IllegalArgumentException e) {
-            log.info("FAILED removal Person with id:{}", id);
-            return false;
+    public String deletePerson(final Long id) {
+        if(!personRepository.existsById(id)) {
+            throw new PersonNotFoundException(id);
         }
+        personRepository.deleteById(id);
+        log.info("User (ID: {}) has been deleted", id);
+        return String.format("User (ID: %s) has been deleted", id);
     }
 
 }
